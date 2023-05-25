@@ -1,6 +1,7 @@
 package com.mudit.blog.controller;
 
 import com.mudit.blog.payload.PostDto;
+import com.mudit.blog.payload.PostResponse;
 import com.mudit.blog.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,8 +25,11 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDto> getAllPosts(){
-        return postService.getAllPosts();
+    public PostResponse getAllPosts(
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
+    ){
+        return postService.getAllPosts(pageNo, pageSize);
     }
 
     @GetMapping("/{id}")
