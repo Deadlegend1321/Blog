@@ -2,10 +2,12 @@ package com.mudit.blog.controller;
 
 import com.mudit.blog.entity.Role;
 import com.mudit.blog.entity.User;
+import com.mudit.blog.payload.JWTAuthResponse;
 import com.mudit.blog.payload.LoginDto;
 import com.mudit.blog.payload.SignUpDto;
 import com.mudit.blog.repository.RoleRepository;
 import com.mudit.blog.repository.UserRepository;
+import com.mudit.blog.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -38,13 +40,18 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     @PostMapping("/signin")
-    public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto){
+    public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsernameOrEmail(),
                 loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("User Logged In Successfully", HttpStatus.OK);
+
+        String token = jwtTokenProvider.generateToken(authentication);
+        return ResponseEntity.ok(new JWTAuthResponse(token));
     }
 
     @PostMapping("/signup")
